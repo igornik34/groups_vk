@@ -1,6 +1,7 @@
+import { IUser } from "../../interfaces/user";
 import "./style.css";
 
-export function UserCard(props) {
+export function UserCard(props: IUser) {
   return (
     <div className="userCard">
       <img className="userPic" src={props.image} />
