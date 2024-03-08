@@ -12,11 +12,9 @@ export function SearchForm() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [fetchUsers, isLoading, usersError] = useFetching(async (name) => {
-    setIsLoadingUsers(true);
     const response = await UsersService.getUsersByName(name);
     const { users }: { users: IUser[] } = await response.json();
     setUsers(users);
-    setIsLoadingUsers(false);
   });
 
   useEffect(() => {
