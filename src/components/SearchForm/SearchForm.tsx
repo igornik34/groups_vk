@@ -6,28 +6,40 @@ import { useFetching } from "../../hooks/useFetching";
 import { IUser } from "../../interfaces/user";
 
 export function SearchForm() {
-  const [valueInput, setValueInput] = useState<string>("");
-  const { setUsers, setError, setIsLoadingUsers } =
+  const { setUsers, setError, setIsLoadingUsers, setInputName, inputName } =
     useContext<IUsersContext>(UsersContext);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [fetchUsers, isLoading, usersError] = useFetching(async (name) => {
+    if (!name) {
+      setUsers([]);
+      return;
+    }
     const response = await UsersService.getUsersByName(name);
-    const { users }: { users: IUser[] } = await response.json();
+    const { users }: { users: IUser[] } = await response?.json();
     setUsers(users);
   });
 
   useEffect(() => {
-    if (valueInput) fetchUsers(valueInput);
-  }, [valueInput]);
+    const timer = setTimeout(() => {
+      fetchUsers(inputName);
+    }, 500);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [inputName]);
 
   useEffect(() => {
     setIsLoadingUsers(isLoading);
   }, [isLoading]);
 
   useEffect(() => {
-    if (usersError) setError(usersError);
+    usersError && setError(usersError);
   }, [usersError]);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, [inputRef]);
 
   return (
     <div className="searchForm">
@@ -35,12 +47,19 @@ export function SearchForm() {
         <input
           ref={inputRef}
           type="text"
-          value={valueInput}
+          value={!!inputName ? inputName : ""}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setValueInput(e.target.value)
+            setInputName(e.target.value)
           }
         />
       </form>
+      {!inputName && (
+        <>
+          <div className="searchImage">
+            <img src="/searchImage.png" alt="search image" />
+          </div>
+        </>
+      )}
     </div>
   );
 }

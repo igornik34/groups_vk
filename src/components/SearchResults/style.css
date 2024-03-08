@@ -7,5 +7,18 @@
 
 .errorMessage {
   color: #f00;
-  text-align: center;
+}
+
+.totalCount {
+  color: #ccc;
+}
+
+.errorImage {
+  width: 250px;
+  margin: 0 auto;
+}
+
+.errorImage img {
+  width: 100%;
+  height: auto;
 }
