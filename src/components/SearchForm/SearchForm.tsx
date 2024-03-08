@@ -1,5 +1,5 @@
-import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
-import "./styles.css";
+import { ChangeEvent, useContext, useEffect, useRef } from "react";
+import "./style.css";
 import UsersContext, { IUsersContext } from "../../store/usersContext";
 import UsersService from "../../API/UsersService";
 import { useFetching } from "../../hooks/useFetching";

@@ -1,6 +1,5 @@
 import { useContext } from "react";
 import { UserCard } from "../UserCard/UserCard";
-
 import "./style.css";
 import UsersContext, { IUsersContext } from "../../store/usersContext";
 import Loader from "../Loader/Loader";
