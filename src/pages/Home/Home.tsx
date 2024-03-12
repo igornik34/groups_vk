@@ -16,7 +16,7 @@ function Home() {
     queryKey: ["groups"],
     queryFn: async () => {
       try {
-        await new Promise((resolve) => setTimeout(resolve, 3000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         const { data } = await axios.get<IGetGroupsResponse>(
           "/mockGroups.json"
         );
