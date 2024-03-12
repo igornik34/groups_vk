@@ -7,14 +7,14 @@ import { useEffect, useState } from "react";
 import { TPrivacy } from "../../types/privacy";
 
 function ListGroups() {
-  const { groups, filteredGroups, error, colorsAvatar } = useSelector(
+  const { filteredGroups, colorsAvatar } = useSelector(
     (s: RootState) => s.groups
   );
   const dispatch = useDispatch<AppDispatch>();
 
-  const [privacy, setPrivacy] = useState<TPrivacy>();
-  const [avatarColor, setAvatarColor] = useState<string>();
-  const [hasFriends, setHasFriends] = useState<boolean>();
+  const [privacy, setPrivacy] = useState<TPrivacy | null>(null);
+  const [avatarColor, setAvatarColor] = useState<string | "all" | null>(null);
+  const [hasFriends, setHasFriends] = useState<boolean | null>(null);
 
   useEffect(() => {
     dispatch(groupsActions.filterGroups({ privacy, avatarColor, hasFriends }));
@@ -32,17 +32,28 @@ function ListGroups() {
     setHasFriends(hasFriends);
   };
 
+  const handleResetFilters = () => {
+    setPrivacy(null);
+    setAvatarColor(null);
+    setHasFriends(null);
+  };
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.filters}>
         <select
           onChange={(e) => handlePrivacyChange(e.target.value as TPrivacy)}
         >
-          <option value="all">All</option>
+          <option value="all" selected={privacy === null}>
+            All
+          </option>
           <option value="closed">Closed</option>
           <option value="opened">Opened</option>
         </select>
         <select onChange={(e) => handleAvatarColorChange(e.target.value)}>
+          <option value="all" selected={avatarColor === null}>
+            All
+          </option>
           {colorsAvatar.map((color) => (
             <option key={color} value={color}>
               {color}
@@ -52,15 +63,19 @@ function ListGroups() {
         <label>
           <input
             type="checkbox"
+            checked={hasFriends ?? false}
             onChange={(e) => handleHasFriendsChange(e.target.checked)}
           />
           Has Friends
         </label>
+        <button onClick={handleResetFilters}>Reset</button>
       </div>
+      <p className={styles.totalCount}>
+        Всего найдено: {filteredGroups?.length}
+      </p>
       {filteredGroups?.map((group) => (
         <GroupCard key={group.id} {...group} />
       ))}
-      {error && <p>{error}</p>}
     </div>
   );
 }

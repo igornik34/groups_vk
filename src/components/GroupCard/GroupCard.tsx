@@ -25,7 +25,10 @@ export function GroupCard(props: IGroup) {
         )}
         {props.friends && !!props.friends.length && (
           <div className={styles.friends}>
-            <div className={styles.countFriends} onClick={() => setShowFriends(!showFriends)}>
+            <div
+              className={styles.countFriends}
+              onClick={() => setShowFriends(!showFriends)}
+            >
               <p>Количество друзей: {props.friends.length}</p>{" "}
               <img src="/arrowDown.svg" alt="arrow down" />
             </div>

@@ -10,9 +10,9 @@ export interface IGroupsState {
 }
 
 export interface IFilterOptions {
-  privacy?: TPrivacy;
-  avatarColor?: string; // Цвет аватарки
-  hasFriends?: boolean; // Наличие друзей
+  privacy: TPrivacy | null;
+  avatarColor: string | "all" | null;
+  hasFriends: boolean | null;
 }
 
 const initialState: IGroupsState = {
@@ -25,17 +25,10 @@ export const groupsSlice = createSlice({
   initialState,
   reducers: {
     addAllGroups: (state, action: PayloadAction<IGroup[]>) => {
-      state.groups = action.payload;
-      state.filteredGroups = action.payload
-      state.colorsAvatar = [
-        ...new Set(
-          action.payload
-            .map((group) => group?.avatar_color)
-            .filter(
-              (color) => color !== null && color !== undefined
-            ) as string[]
-        ),
-      ];
+      const groups = action.payload;
+      state.groups = groups;
+      state.filteredGroups = groups;
+      state.colorsAvatar = [...new Set(groups.map(group => group.avatar_color).filter(color => !!color) as string[])];
     },
     setError: (state, action: PayloadAction<string>) => {
       state.error = action.payload;
@@ -43,36 +36,17 @@ export const groupsSlice = createSlice({
     filterGroups: (state, action: PayloadAction<IFilterOptions>) => {
       const { privacy, avatarColor, hasFriends } = action.payload;
 
-      let filteredGroups = state.groups;
-
-      // Фильтрация по типу приватности
-      if (privacy) {
-        if (privacy === "closed") {
-          filteredGroups = filteredGroups.filter((group) => group.closed);
-        } else if (privacy === "opened") {
-          filteredGroups = filteredGroups.filter((group) => !group.closed);
-        } else if (privacy === "all") {
-          filteredGroups = state.groups;
+      state.filteredGroups = state.groups.filter(group => {
+        if (privacy !== null) {
+          if (privacy === "closed") {
+            return group.closed;
+          } else if (privacy === "opened") {
+            return !group.closed;
+          }
         }
-      }
-
-      // Фильтрация по цвету аватарки
-      if (avatarColor) {
-        filteredGroups = filteredGroups.filter(
-          (group) => group.avatar_color === avatarColor
-        );
-      }
-
-      // Фильтрация по наличию друзей
-      if (hasFriends !== undefined) {
-        if (hasFriends) {
-          filteredGroups = filteredGroups.filter(
-            (group) => group.friends && group.friends.length > 0
-          );
-        }
-      }
-
-      state.filteredGroups = filteredGroups;
+        return true;
+      }).filter(group => avatarColor === null || avatarColor === "all" || group.avatar_color === avatarColor)
+        .filter(group => hasFriends === null || hasFriends === false || (group.friends && group.friends.length > 0));
     },
   },
 });

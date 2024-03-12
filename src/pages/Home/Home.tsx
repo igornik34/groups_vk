@@ -1,21 +1,22 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { IGetGroupsResponse } from "../../interfaces/groupsResponse";
 import { useQuery } from "@tanstack/react-query";
-import axios, { AxiosError } from "axios";
-import { AppDispatch } from "../../store/store";
+import axios from "axios";
+import { AppDispatch, RootState } from "../../store/store";
 import { groupsActions } from "../../store/groups.slice";
 import { useEffect } from "react";
 import ListGroups from "../../components/ListGroups/ListGroups";
 import Loader from "../../components/UI/Loader/Loader";
-import styles from "./Home.module.css"
+import styles from "./Home.module.css";
 
 function Home() {
   const dispatch = useDispatch<AppDispatch>();
+  const errorRequest = useSelector((s: RootState) => s.groups.error);
   const { isLoading, error } = useQuery({
     queryKey: ["groups"],
     queryFn: async () => {
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 3000));
         const { data } = await axios.get<IGetGroupsResponse>(
           "/mockGroups.json"
         );
@@ -39,7 +40,15 @@ function Home() {
   return (
     <div className={styles.home}>
       {isLoading && <Loader />}
-      <ListGroups />
+      {!isLoading && !errorRequest && <ListGroups />}
+      {errorRequest && (
+        <>
+          <div className={styles.errorImage}>
+            <img src="/errorImage.png" alt="error image" />
+          </div>
+          <p className={styles.errorMessage}>{errorRequest}</p>
+        </>
+      )}
     </div>
   );
 }
