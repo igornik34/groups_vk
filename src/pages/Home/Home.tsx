@@ -12,7 +12,7 @@ import styles from "./Home.module.css";
 function Home() {
   const dispatch = useDispatch<AppDispatch>();
   const errorRequest = useSelector((s: RootState) => s.groups.error);
-  const { isLoading, error } = useQuery({
+  const {data, isLoading, error } = useQuery({
     queryKey: ["groups"],
     queryFn: async () => {
       try {
@@ -23,7 +23,6 @@ function Home() {
         if (data.result === 0 || !data.data) {
           throw new Error("Ошибка при отправке запроса");
         }
-        dispatch(groupsActions.addAllGroups(data.data));
         return data;
       } catch (error) {
         throw error;
@@ -32,10 +31,13 @@ function Home() {
   });
 
   useEffect(() => {
-    if (error) {
+    if(data?.data) {
+      dispatch(groupsActions.addAllGroups(data?.data));
+    }
+    if (error?.message) {
       dispatch(groupsActions.setError(error.message));
     }
-  }, [error, dispatch]);
+  }, [data, error, dispatch]);
 
   return (
     <div className={styles.home}>
